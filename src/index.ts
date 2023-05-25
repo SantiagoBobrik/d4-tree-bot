@@ -22,6 +22,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   const command = commands[commandName];
 
+  if (command == null) return;
+
   try {
     command.execute(interaction);
   } catch (error) {

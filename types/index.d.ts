@@ -1,5 +1,4 @@
 export interface Command {
-  name: string;
-  description: string;
+  data: SlashCommandBuilder;
   execute: (message: Discord.Message) => void;
 }

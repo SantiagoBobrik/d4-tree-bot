@@ -6,10 +6,7 @@ export const registerCommands = async (
 ): Promise<void> => {
   //
 
-  const commandsArray = Object.values(commands).map((command) => ({
-    name: command.name,
-    description: command.description,
-  }));
+  const commandsArray = Object.values(commands).map((command) => command.data);
 
   const rest = new REST({ version: '10' }).setToken(token);
 
