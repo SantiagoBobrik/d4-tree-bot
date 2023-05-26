@@ -1,7 +1,7 @@
 import {
   type ChatInputCommandInteraction,
-  bold,
   SlashCommandBuilder,
+  EmbedBuilder,
 } from 'discord.js';
 
 import type { Command } from '../../types';
@@ -24,17 +24,23 @@ const commandData = new SlashCommandBuilder()
       .addChoices(
         {
           name: diabloClasses.barbarian.name,
-          value: diabloClasses.barbarian.emoji,
+          value: diabloClasses.barbarian.id.toString(),
         },
-        { name: diabloClasses.druid.name, value: diabloClasses.druid.emoji },
+        {
+          name: diabloClasses.druid.name,
+          value: diabloClasses.druid.id.toString(),
+        },
         {
           name: diabloClasses.necromancer.name,
-          value: diabloClasses.necromancer.emoji,
+          value: diabloClasses.necromancer.id.toString(),
         },
-        { name: diabloClasses.rogue.name, value: diabloClasses.rogue.emoji },
+        {
+          name: diabloClasses.rogue.name,
+          value: diabloClasses.rogue.id.toString(),
+        },
         {
           name: diabloClasses.sorcerer.name,
-          value: diabloClasses.sorcerer.emoji,
+          value: diabloClasses.sorcerer.id.toString(),
         }
       )
   )
@@ -46,43 +52,53 @@ const commandData = new SlashCommandBuilder()
       .setName('descripcion')
       .setDescription('Breve descripcion de lo que se trata la build')
       .setRequired(true)
+  )
+  .addStringOption((option) =>
+    option
+      .setName('imagen')
+      .setDescription('Url de una imagen que quieras agregar')
+      .setRequired(false)
   );
 
 export const share: Command = {
   data: commandData,
   execute(message: ChatInputCommandInteraction) {
     const user = message.user;
-    const url = message.options.getString('url') as string;
-    const clase = message.options.getString('clase') as string;
+    const url = message.options.getString('url');
+    const classId = message.options.getString('clase');
     const descripcion = message.options.getString('descripcion') as string;
     const tipo = message.options.getString('tipo') as string;
-    const className =
-      Object.values(diabloClasses).find((c) => c.emoji === clase)?.name ?? '';
-    const emoji = message.guild?.emojis.cache.find(
-      (emoji) => emoji.name === clase
+    const imageFooter = message.options.getString('imagen');
+    const classSelected = Object.values(diabloClasses).find(
+      (c) => c.id === Number(classId)
     );
-    const emojiString = emoji?.toString() ?? '';
 
-    const title = `Nueva build para ${className} ${emojiString} ${tipo}`;
-    const messageFormated = `
+    const exampleEmbed = new EmbedBuilder()
+      .setColor(0x640000)
+      .setTitle(`Build ${classSelected?.name ?? ''} ${tipo}`)
+      .setAuthor({
+        name: user.username,
+        iconURL: message.user.displayAvatarURL(),
+      })
+      .setDescription(descripcion)
+      .setThumbnail(classSelected?.image ?? '')
+      .setTimestamp()
+      .setFooter({
+        text: 'Recuerda que puedes compartir tu build con el comando /share',
+      });
 
-    == ${bold('Autor')} ==
-     ${user.toString()}
+    if (imageFooter !== null) {
+      exampleEmbed.setImage(imageFooter);
+    }
 
-    == ${bold('Descripcion')} ==
-    ${descripcion}
+    if (url?.includes('d4tree') ?? false) {
+      exampleEmbed.setURL(url);
+      exampleEmbed.addFields(
+        { name: 'Url:', value: url ?? '' },
+        { name: '\u200B', value: '\u200B' }
+      );
+    }
 
-    == ${bold('Url')} ==
-    ${url}
-    
-    `;
-
-    const embed = {
-      color: 0x640000,
-      title,
-      description: messageFormated,
-    };
-
-    message.reply({ embeds: [embed] });
+    message.reply({ embeds: [exampleEmbed] });
   },
 };
