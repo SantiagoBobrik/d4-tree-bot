@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { Client, GatewayIntentBits, Events } from 'discord.js';
 import { clientReady } from './helpers/clientReady';
 import { registerCommands } from './helpers/registerCommands';
+import { keepAlive } from './keepAlive';
 
 const TOKEN = process.env.TOKEN as string;
 const GUILD_ID = process.env.GUILD_ID as string;
@@ -35,4 +36,5 @@ client.on(Events.InteractionCreate, async (interaction) => {
 registerCommands(TOKEN, GUILD_ID);
 
 //  Login to the client
+keepAlive();
 client.login(TOKEN);
