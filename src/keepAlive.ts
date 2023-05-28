@@ -3,6 +3,7 @@ import express from 'express';
 const app = express();
 
 app.all('/', (req, res) => {
+  console.log('Bot is running!');
   res.send('Bot is running!');
 });
 
